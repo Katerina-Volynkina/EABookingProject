@@ -87,10 +87,3 @@ class APIClient:
         return response.json()
 
 
-a = APIClient()
-
-sss = a.get_client_ids()
-print(sorted(sss, key=lambda x: x['bookingid']))
-
-ss = a.get_booking_by_id("1")
-print(ss)
