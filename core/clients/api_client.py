@@ -1,6 +1,8 @@
 import requests
 import os
 from dotenv import load_dotenv
+from requests.auth import HTTPBasicAuth
+
 from core.settings.environments import Environment
 from core.clients.endpoints import Endpoints
 from core.settings.config import Users, Timeouts
@@ -84,5 +86,51 @@ class APIClient:
         with allure.step('Checking status code'):
             assert response.status_code == 200, f'Expected status 200, but got {response.status_code}'
         return response.json()
+
+    def delete_booking(self, client_id: str):
+        with allure.step('Delete booking'):
+            url = f'{self.base_url}{Endpoints.BOOKING_ENDPOINT.value}/{client_id}'
+            response = self.session.delete(url, auth=HTTPBasicAuth(Users.USERNAME, Users.PASSWORD))
+            response.raise_for_status()
+        with allure.step('Checking status code'):
+            assert response.status_code == 201, f'Expected status 201, but got {response.status_code}'
+        return response.status_code == 201
+
+    def create_booking(self, booking_data):
+        with allure.step('Create booking'):
+            url = f'{self.base_url}{Endpoints.BOOKING_ENDPOINT.value}'
+            response = self.session.post(url, json =booking_data)
+            response.raise_for_status()
+        with allure.step('Checking status code'):
+            assert response.status_code == 200, f'Expected status 201, but got {response.status_code}'
+        return response.json()
+    def get_booking_ids(self, params=None):
+        with allure.step('Getting object with bookings'):
+            url = f'{self.base_url}{Endpoints.BOOKING_ENDPOINT.value}'
+            response = self.session.get(url, params=params)
+            response.raise_for_status()
+        with allure.step('Checking status code'):
+            assert response.status_code == 200, f'Expected status 200 but got {response.status_code}'
+        return response.json()
+
+    def update_booking(self, client_id, booking_data):
+        with allure.step('Update booking'):
+            url = f'{self.base_url}{Endpoints.BOOKING_ENDPOINT.value}/{client_id}'
+            response = self.session.put(url, json=booking_data)
+            response.raise_for_status()
+        with allure.step('Checking status code'):
+            assert response.status_code == 200, f'Expected status 200, but got {response.status_code}'
+        return response.json()
+
+    def patch_booking(self, client_id, patch_data):
+        with allure.step('Patch booking'):
+            url = f'{self.base_url}{Endpoints.BOOKING_ENDPOINT.value}/{client_id}'
+            response = self.session.patch(url, json=patch_data)
+            response.raise_for_status()
+        with allure.step('Checking status code'):
+            assert response.status_code == 200, f'Expected status 200, but got {response.status_code}'
+        return response.json()
+
+
 
 
