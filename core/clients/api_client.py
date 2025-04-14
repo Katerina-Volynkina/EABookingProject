@@ -114,8 +114,8 @@ class APIClient:
             assert response.status_code == 200, f'Expected status 200, but got {response.status_code}'
         return response.json()
 
-    def patch_booking(self, booking_id, patch_data):
-        with allure.step('Patch booking'):
+    def partial_update_booking(self, booking_id, patch_data):
+        with allure.step('Partial update booking'):
             url = f'{self.base_url}{Endpoints.BOOKING_ENDPOINT.value}/{booking_id}'
             response = self.session.patch(url, json=patch_data)
             response.raise_for_status()
