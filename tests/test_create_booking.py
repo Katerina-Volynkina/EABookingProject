@@ -1,8 +1,6 @@
 import allure
 import pytest
 from pydantic import ValidationError
-from requests import HTTPError
-
 from core.clients.endpoints import Endpoints
 from core.models.booking import BookingResponse
 
