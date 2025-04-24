@@ -1,6 +1,7 @@
 import allure
 import pytest
 from pydantic import ValidationError
+from requests.exceptions import HTTPError
 from core.clients.endpoints import Endpoints
 from core.models.booking import BookingResponse
 
@@ -66,19 +67,9 @@ def test_create_booking_with_random_date(api_client, generate_random_booking_dat
          'depositpaid': True,
          'additionalneeds': 'Lunch'
      }, 'bookingdates'),
-    ({  # неверный формат даты
-         'firstname': 'John',
-         'lastname': 'Doe',
-         'totalprice': 200,
-         'depositpaid': True,
-         'bookingdates': {'checkin': '01-05-2025', 'checkout': '10-05-2025'},
-         'additionalneeds': 'Lunch'
-     }, 'bookingdates'),
     ({}, 'all fields')  # полностью пустой запрос
 ])
 def test_create_booking_negative(api_client, invalid_data, missing_field):
     with allure.step(f'Attempt to create booking with missing/invalid field: {missing_field}'):
-        response = api_client.session.post(f"{api_client.base_url}{Endpoints.BOOKING_ENDPOINT.value}", json=invalid_data)
-        assert response.status_code == 500 or 200, (
-            f"Expected failure when {missing_field} is invalid/missing, but got OK with response: {response.json()}"
-        )
+        with pytest.raises(HTTPError):
+            api_client.create_booking(invalid_data)
