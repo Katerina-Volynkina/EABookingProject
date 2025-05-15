@@ -14,10 +14,12 @@ class APIClient:
     def __init__(self):
         self.headers = None
         environment_str = os.getenv('ENVIRONMENT')
+        if environment_str is None:
+            raise ValueError('ENVIRONMENT variable is not set')
         try:
             environment = Environment[environment_str]
         except KeyError:
-            raise ValueError(f'Unsupported enviroment value: {environment_str}')
+            raise ValueError(f'Unsupported environment value: {environment_str}')
 
         self.base_url = self.get_base_url(environment)
         self.session = requests.Session()
@@ -26,13 +28,16 @@ class APIClient:
             'accept': '*/*'
         }
 
-    def get_base_url(self, environment: Environment) -> str:
+    def get_base_url(self, environment):
         if environment == Environment.TEST:
-            return os.getenv('TEST_BASE_URL')
+            url = os.getenv("TEST_BASE_URL")
         elif environment == Environment.PROD:
-            return os.getenv('PROD_BASE_URL')
+            url = os.getenv("PROD_BASE_URL")
         else:
-            raise ValueError(f'Unsupported environment:{environment}')
+            raise ValueError(f"Unsupported environment: {environment}")
+        if not url:
+            raise ValueError(f"Base URL not found for environment {environment}")
+        return url
 
     def get(self, endpoint, params=None, status_code=200):
         url = self.base_url + endpoint
