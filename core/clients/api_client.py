@@ -1,21 +1,18 @@
 import requests
 import os
-from dotenv import load_dotenv
 from requests.auth import HTTPBasicAuth
 from core.settings.environments import Environment
 from core.clients.endpoints import Endpoints
 from core.settings.config import Users, Timeouts
 import allure
+from dotenv import load_dotenv
 
 load_dotenv()
 
 
 class APIClient:
     def __init__(self):
-        self.headers = None
         environment_str = os.getenv('ENVIRONMENT')
-        if environment_str is None:
-            raise ValueError('ENVIRONMENT variable is not set')
         try:
             environment = Environment[environment_str]
         except KeyError:
@@ -28,27 +25,24 @@ class APIClient:
             'accept': '*/*'
         }
 
-    def get_base_url(self, environment):
+    def get_base_url(self, environment: Environment) -> str:
         if environment == Environment.TEST:
-            url = os.getenv("TEST_BASE_URL")
+            return os.getenv("TEST_BASE_URL")
         elif environment == Environment.PROD:
-            url = os.getenv("PROD_BASE_URL")
+            return os.getenv("PROD_BASE_URL")
         else:
             raise ValueError(f"Unsupported environment: {environment}")
-        if not url:
-            raise ValueError(f"Base URL not found for environment {environment}")
-        return url
 
     def get(self, endpoint, params=None, status_code=200):
         url = self.base_url + endpoint
-        response = requests.get(url, headers=self.headers,params=params)
+        response = requests.get(url, headers=self.session.headers,params=params)
         if status_code:
             assert response.status_code == status_code
         return response.json()
 
     def post(self, endpoint, data=None, status_code=200):
         url = self.base_url + endpoint
-        response = requests.post(url, headers=self.headers,json=data)
+        response = requests.post(url, headers=self.session.headers,json=data)
         if status_code:
             assert response.status_code == status_code
         return response.json()
@@ -128,7 +122,6 @@ class APIClient:
         with allure.step('Checking status code'):
             assert response.status_code == 200, f'Expected status 200, but got {response.status_code}'
         return response.json()
-
 
 
 
