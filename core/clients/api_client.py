@@ -33,6 +33,7 @@ class APIClient:
         else:
             raise ValueError(f"Unsupported environment: {environment}")
 
+
     def get(self, endpoint, params=None, status_code=200):
         url = self.base_url + endpoint
         response = requests.get(url, headers=self.session.headers,params=params)
