@@ -15,26 +15,27 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                 // Запуск тестов и генерация отчета allure
-                 sh 'python3 -m pytest --alluredir allure-results'
+                // Запуск тестов и генерация отчета allure
+                sh 'python3 -m pytest --alluredir allure-results'
             }
         }
 
         stage('Generate Allure Report') {
             steps {
-            // Публикация Allure отчетов (если установлен плагин Allure)
-            allure([
-                includeProperties: false,
-                jdk: '',
-                results: [[path: 'allure-results']]
-            ])
+                // Публикация Allure отчетов (если установлен плагин Allure)
+                allure([
+                    includeProperties: false,
+                    jdk: '',
+                    results: [[path: 'allure-results']]
+                ])
+            }
         }
-    }
+    } // ← вот эта скобка была пропущена
 
     post {
         always {
             // Сохранение отчетов о тестировании и любых других артефактов
-            archiveArtifacts artifacts: '**/allure-results/**',allowEmptyArchive: true
+            archiveArtifacts artifacts: '**/allure-results/**', allowEmptyArchive: true
         }
         failure {
             // Если сборка провалилась, отправить уведомление или выполнить другое действие
