@@ -9,7 +9,6 @@ def api_client():
     client.auth()
     return client
 
-
 @pytest.fixture
 def booking_dates():
     today = datetime.today()
